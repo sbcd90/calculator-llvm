@@ -1,3 +1,5 @@
 https://embeddedartistry.com/blog/2017/02/24/installing-llvm-clang-on-osx/
 brew install llvm
+which llvm-config
+which clang++
 https://stackoverflow.com/questions/104322/how-do-you-install-boost-on-macos

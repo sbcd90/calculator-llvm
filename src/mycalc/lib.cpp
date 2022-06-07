@@ -1,4 +1,5 @@
 #include <iostream>
+#include "lib.h"
 
 class Solution {
 public:
