@@ -6,7 +6,9 @@
 #include "codegen.h"
 
 namespace mycalc {
-
+    std::string parseAndStringize(std::string const&);
+    void parseAndCodegen(std::string const&, codegen::LLVMCodeGenerator&);
+    ast::AnyExpr parse(std::string const&);
 }
 
 #endif // MYCALC_LIB_H_
