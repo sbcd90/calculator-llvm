@@ -1,7 +1,7 @@
 #ifndef MYCALC_CODEGEN_H_
 #define MYCALC_CODEGEN_H_
 
-#include "ast/Ast.h"
+#include "ast/ast.h"
 #include <boost/variant/static_visitor.hpp>
 #include <llvm/IR/Module.h>
 #include <llvm/IR/IRBuilder.h>

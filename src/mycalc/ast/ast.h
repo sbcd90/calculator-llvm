@@ -1,4 +1,4 @@
-#ifndef AST_H_
+#ifndef MYCALC_AST_H_
 #define MYCALC_AST_H_
 
 #include <utility>
@@ -9,7 +9,7 @@
 #include <string>
 #include <memory>
 
-#include "AstBase.h"
+#include "ast_base.h"
 #include "../semantics/type.h"
 
 namespace mycalc {
