@@ -12,7 +12,7 @@
 
 namespace mycalc {
     std::string parseAndStringize(const std::string &src) {
-
+        return {};
     }
 
     void parseAndCodegen(const std::string &src, codegen::LLVMCodeGenerator &gen) {
@@ -20,6 +20,7 @@ namespace mycalc {
     }
 
     ast::AnyExpr parse(const std::string &src) {
-
+        parser::MyCalcParser parser{};
+        return parser.parse(src);
     }
 }

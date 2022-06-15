@@ -93,6 +93,7 @@ namespace mycalc {
 
         namespace visitor {
             class Stringizer: public boost::static_visitor<std::string> {
+            public:
                 std::string operator()(IntExpr const&) const;
                 std::string operator()(FloatExpr const&) const;
                 std::string operator()(BinOpExpr const&) const;

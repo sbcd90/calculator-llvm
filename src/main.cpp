@@ -16,7 +16,9 @@ int main(int argc, char **argv) {
     mycalc::codegen::LLVMCodeGenerator gen{"Toplevel", ctx};
 
     auto cnt = 0;
-    while (loop(gen, cnt++));
+    while (loop(gen, cnt++)) {
+
+    }
 
     std::ofstream out{argv[1], std::ios_base::out};
     llvm::raw_os_ostream o{out};
