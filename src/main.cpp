@@ -44,10 +44,10 @@ bool loop(mycalc::codegen::LLVMCodeGenerator &gen, int cnt) {
         return true;
     }
 
-/*    if (llvm::verifyModule(*gen.getModule())) {
+    if (llvm::verifyModule(*gen.getModule())) {
         std::cerr << "something goes wrong" << std::endl;
     }
 
-    gen.getModule()->print(llvm::errs(), nullptr);*/
+    gen.getModule()->print(llvm::errs(), nullptr);
     return true;
 }
