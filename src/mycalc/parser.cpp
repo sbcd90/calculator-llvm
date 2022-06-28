@@ -1,8 +1,14 @@
 #include "parser.h"
+
+#define BOOST_SPIRIT_USE_PHOENIX_V3
+
 #include <iostream>
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/phoenix.hpp>
 #include <boost/spirit/include/support_line_pos_iterator.hpp>
+#include <boost/variant/variant.hpp>
+#include <boost/variant/static_visitor.hpp>
+#include <boost/fusion/include/vector.hpp>
 
 namespace mycalc {
     namespace parser {
@@ -73,17 +79,17 @@ namespace mycalc {
         using namespace qi::labels;
 
         template<class Iter>
-        class MyCalcGrammar: public qi::grammar<Iter, ast::AnyExpr, ascii::space_type> {
+        class MyCalcGrammar: public qi::grammar<Iter, ast::AnyExpr(), ascii::space_type> {
             template<class T>
             using rule = qi::rule<Iter, T, ascii::space_type>;
 
             phx::function<helper::Annotation_f<Iter>> annotate;
-            rule<ast::IntExpr> intExpr;
-            rule<ast::FloatExpr> floatExpr;
-            rule<ast::AnyExpr> primaryExpr;
-            rule<ast::AnyExpr> mulExpr;
-            rule<ast::AnyExpr> addExpr;
-            rule<ast::AnyExpr> expression;
+            rule<ast::IntExpr()> intExpr;
+            rule<ast::FloatExpr()> floatExpr;
+            rule<ast::AnyExpr()> primaryExpr;
+            rule<ast::AnyExpr()> mulExpr;
+            rule<ast::AnyExpr()> addExpr;
+            rule<ast::AnyExpr()> expression;
 
             template<typename T>
             struct MakeSharedPtrLazy {
@@ -101,8 +107,27 @@ namespace mycalc {
             }
 
         public:
-            MyCalcGrammar(const Iter src) {
+            MyCalcGrammar(const Iter src): MyCalcGrammar::base_type(expression), annotate(src) {
+                intExpr = qi::int_[_val = phx::construct<ast::IntExpr>(_1)];
 
+                floatExpr = qi::real_parser<float, qi::strict_real_policies<float>>()[_val = phx::construct<ast::FloatExpr>(_1)];
+
+                primaryExpr %= floatExpr | intExpr | '(' >> expression >> ')';
+
+                mulExpr = primaryExpr[_val = _1] >> *((qi::string("*") | qi::string("/")) >>
+                        primaryExpr)[_val = phx::construct<ast::BinOpExpr>(_1, _val, _2)];
+
+                addExpr = mulExpr[_val = _1] >> *((qi::string("+") | qi::string("-")) >>
+                        mulExpr)[_val = phx::construct<ast::BinOpExpr>(_1, _val, _2)];
+
+                expression %= addExpr;
+
+                qi::on_success(intExpr, annotate(_val, _1, _3));
+                qi::on_success(floatExpr, annotate(_val, _1, _3));
+                qi::on_success(primaryExpr, annotate(_val, _1, _3));
+                qi::on_success(mulExpr, annotate(_val, _1, _3));
+                qi::on_success(addExpr, annotate(_val, _1, _3));
+                qi::on_success(expression, annotate(_val, _1, _3));
             }
         };
 
@@ -111,8 +136,14 @@ namespace mycalc {
             using iterator_t = decltype(begin);
             auto end = helper::line_pos_iterator(std::end(src));
 
-            std::cout << "hit" << std::endl;
-            return {};
+            MyCalcGrammar<iterator_t> grammar{begin};
+            ast::AnyExpr result;
+
+            if (!qi::phrase_parse(begin, end, grammar, ascii::space, result) || begin != end) {
+                std::cerr << "error: " << std::string{begin, end} << std::endl;
+                throw "syntax error";
+            }
+            return result;
         }
     }
 }
